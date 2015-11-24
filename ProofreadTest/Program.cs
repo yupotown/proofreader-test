@@ -13,7 +13,7 @@ namespace ProofreadTest
             var pr = new Proofreader();
 
             // 正しい単語一覧
-            pr.CorrectWords.AddRange(new List<string>
+            var dic = new List<string>
             {
                 "apple",
                 "tomorrow",
@@ -22,27 +22,38 @@ namespace ProofreadTest
                 "りんご",
                 "ごりら",
                 "†漆黒のらっぱ†",
-            });
+            };
+            foreach (var word in dic)
+            {
+                pr.CorrectWords.Add(word);
+            }
 
             // テストケース
-            var cases = new Dictionary<string, List<string>>();
-            cases.Add("apple", new List<string> { "apple" });
-            cases.Add("tommorow", new List<string> { "tomorrow" });
-            cases.Add("whie", new List<string> { "white", "while" });
-            cases.Add("whiteご", new List<string> { "white" });
-            cases.Add("りwhile", new List<string> { "while" });
-            cases.Add("りんご", new List<string> { "りんご" });
-            cases.Add("ごりｒあ", new List<string> { "ごりら" });
-            cases.Add("†漆黒のラッパ†", new List<string> { "†漆黒のらっぱ†" });
+            var cases = new Dictionary<string, HashSet<string>>();
+            cases.Add("apple", new HashSet<string> { "apple" });
+            cases.Add("tommorow", new HashSet<string> { "tomorrow" });
+            cases.Add("whie", new HashSet<string> { "white", "while" });
+            cases.Add("whiteご", new HashSet<string> { "white" });
+            cases.Add("りwhile", new HashSet<string> { "while" });
+            cases.Add("りんご", new HashSet<string> { "りんご" });
+            cases.Add("ごりｒあ", new HashSet<string> { "ごりら" });
+            cases.Add("†漆黒のラッパ†", new HashSet<string> { "†漆黒のらっぱ†" });
 
             // テスト
             foreach (var cas in cases)
             {
                 var res = pr.Proofread(cas.Key);
-                Console.WriteLine("{0} : {1} -> {2}",
-                    cas.Value.Contains(res.Word),
-                    cas.Key, res.Word);
+                Console.WriteLine("{0} : {1} -> {2} ({3})",
+                    res.CorrectWords.SetEquals(cas.Value),
+                    cas.Key,
+                    ToString(res.CorrectWords),
+                    ToString(cas.Value));
             }
+        }
+
+        static string ToString(IEnumerable<string> words)
+        {
+            return string.Format("{{{0}}}", string.Join(", ", words));
         }
     }
 }

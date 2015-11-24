@@ -8,13 +8,17 @@ namespace ProofreadTest
 {
     public class ProofreaderResult
     {
-        public ProofreaderResult(string original, string word)
+        public ProofreaderResult(string original, IEnumerable<string> words)
         {
             this.OriginalWord = original;
-            this.Word = word;
+            this.CorrectWords = new HashSet<string>();
+            foreach (var word in words)
+            {
+                this.CorrectWords.Add(word);
+            }
         }
 
         public string OriginalWord { get; private set; }
-        public string Word { get; private set; }
+        public HashSet<string> CorrectWords { get; private set; }
     }
 }
