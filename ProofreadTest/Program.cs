@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,19 +14,9 @@ namespace ProofreadTest
             var pr = new Proofreader();
 
             // 正しい単語一覧
-            var dic = new List<string>
+            foreach (var word in File.ReadAllLines("words.txt"))
             {
-                "apple",
-                "tomorrow",
-                "white",
-                "while",
-                "りんご",
-                "ごりら",
-                "†漆黒のらっぱ†",
-            };
-            foreach (var word in dic)
-            {
-                pr.CorrectWords.Add(word);
+                pr.AddCorrectWord(word);
             }
 
             // テストケース
@@ -44,7 +35,7 @@ namespace ProofreadTest
             {
                 var res = pr.Proofread(cas.Key);
                 Console.WriteLine("{0} : {1} -> {2} ({3})",
-                    res.CorrectWords.SetEquals(cas.Value),
+                    cas.Value.All(word => res.CorrectWords.Contains(word)),
                     cas.Key,
                     ToString(res.CorrectWords),
                     ToString(cas.Value));
