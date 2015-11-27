@@ -149,6 +149,42 @@ namespace ProofreadTest
         }
 
         /// <summary>
+        /// 1のビット数を数える。
+        /// </summary>
+        /// <param name="bits">非負整数値</param>
+        /// <returns>ビット数</returns>
+        public int CountBits(UInt64 bits)
+        {
+            bits = (bits & 0x5555555555555555u) + (bits >> 1 & 0x5555555555555555u);
+            bits = (bits & 0x3333333333333333u) + (bits >> 2 & 0x3333333333333333u);
+            bits = (bits & 0x0f0f0f0f0f0f0f0fu) + (bits >> 4 & 0x0f0f0f0f0f0f0f0fu);
+            bits = (bits & 0x00ff00ff00ff00ffu) + (bits >> 8 & 0x00ff00ff00ff00ffu);
+            bits = (bits & 0x0000ffff0000ffffu) + (bits >> 16 & 0x0000ffff0000ffffu);
+            bits = (bits & 0x00000000ffffffffu) + (bits >> 32 & 0x00000000ffffffffu);
+            return (int)bits;
+        }
+
+        /// <summary>
+        /// 1のビット数を数える。
+        /// </summary>
+        /// <param name="bits">非負整数値</param>
+        /// <returns>ビット数</returns>
+        public int CountBitsOld(UInt64 bits)
+        {
+            var res = 0;
+            UInt64 mask = 1;
+            for (var i = 0; i < 64; ++i)
+            {
+                if ((bits & mask) != 0)
+                {
+                    ++res;
+                }
+                mask <<= 1;
+            }
+            return res;
+        }
+
+        /// <summary>
         /// デバッグ用出力の有無
         /// </summary>
         public bool DebugPrint { get; set; }
@@ -185,22 +221,7 @@ namespace ProofreadTest
             {
                 return int.MaxValue;
             }
-            return Math.Max(countBits(a - ab), countBits(b - ab));
-        }
-
-        private int countBits(UInt64 a)
-        {
-            var res = 0;
-            UInt64 mask = 1;
-            for (var i = 0; i < 64; ++i)
-            {
-                if ((a & mask) != 0)
-                {
-                    ++res;
-                }
-                mask <<= 1;
-            }
-            return res;
+            return Math.Max(CountBits(a - ab), CountBits(b - ab));
         }
     }
 }
