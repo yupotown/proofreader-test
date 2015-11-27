@@ -82,39 +82,6 @@ namespace ProofreadTest
         }
 
         /// <summary>
-        /// 正しい単語リストの中から、指定した文字列に近い単語を取得する。
-        /// レーベンシュタイン距離のみを使って処理する。
-        /// </summary>
-        /// <param name="word">文字列</param>
-        /// <returns></returns>
-        public ProofreaderResult ProofreadOld(string word)
-        {
-            // 元から正しい単語ならそのまま返す
-            if (correctWordsOld.Contains(word))
-            {
-                return new ProofreaderResult(word, new List<string> { word });
-            }
-
-            // レーベンシュタイン距離が最も近いものを返す
-            var min = int.MaxValue;
-            var res = new List<string>();
-            foreach (var cw in hashes.Keys)
-            {
-                var dist = MeasureLevenshtein(word, cw);
-                if (dist < min)
-                {
-                    min = dist;
-                    res = new List<string> { cw };
-                }
-                else if (dist == min)
-                {
-                    res.Add(cw);
-                }
-            }
-            return new ProofreaderResult(word, res);
-        }
-
-        /// <summary>
         /// 2つの文字列のレーベンシュタイン距離(編集距離)を計算する。
         /// </summary>
         /// <param name="a">文字列</param>
@@ -145,7 +112,6 @@ namespace ProofreadTest
         {
             hashes.Add(word, new WordHash(word));
             correctWords.Add(word);
-            correctWordsOld.Add(word);
         }
 
         /// <summary>
@@ -155,6 +121,5 @@ namespace ProofreadTest
 
         private Dictionary<string, WordHash> hashes = new Dictionary<string, WordHash>();
         private List<string> correctWords = new List<string>();
-        private HashSet<string> correctWordsOld = new HashSet<string>();
     }
 }
