@@ -28,12 +28,12 @@ namespace ProofreadTest
             }
 
             // 辞書の各単語とのハッシュ距離を計算する
-            var hash = generateHash(word);
+            var hash = new WordHash(word);
             var allWords = hashes.Keys.ToList(); // うーん
             var hashDists = new int[allWords.Count];
             for (var i = 0; i < allWords.Count; ++i)
             {
-                hashDists[i] = measureHashDist(hash, hashes[allWords[i]]);
+                hashDists[i] = WordHash.MeasureDistance(hash, hashes[allWords[i]]);
             }
             var candidates = new List<string>();
             for (var dist = 0; candidates.Count < candidatesCount; ++dist)
@@ -143,45 +143,9 @@ namespace ProofreadTest
         /// <param name="word">正しい単語</param>
         public void AddCorrectWord(string word)
         {
-            hashes.Add(word, generateHash(word));
+            hashes.Add(word, new WordHash(word));
             correctWords.Add(word);
             correctWordsOld.Add(word);
-        }
-
-        /// <summary>
-        /// 1のビット数を数える。
-        /// </summary>
-        /// <param name="bits">非負整数値</param>
-        /// <returns>ビット数</returns>
-        public int CountBits(UInt64 bits)
-        {
-            bits = (bits & 0x5555555555555555u) + (bits >> 1 & 0x5555555555555555u);
-            bits = (bits & 0x3333333333333333u) + (bits >> 2 & 0x3333333333333333u);
-            bits = (bits & 0x0f0f0f0f0f0f0f0fu) + (bits >> 4 & 0x0f0f0f0f0f0f0f0fu);
-            bits = (bits & 0x00ff00ff00ff00ffu) + (bits >> 8 & 0x00ff00ff00ff00ffu);
-            bits = (bits & 0x0000ffff0000ffffu) + (bits >> 16 & 0x0000ffff0000ffffu);
-            bits = (bits & 0x00000000ffffffffu) + (bits >> 32 & 0x00000000ffffffffu);
-            return (int)bits;
-        }
-
-        /// <summary>
-        /// 1のビット数を数える。
-        /// </summary>
-        /// <param name="bits">非負整数値</param>
-        /// <returns>ビット数</returns>
-        public int CountBitsOld(UInt64 bits)
-        {
-            var res = 0;
-            UInt64 mask = 1;
-            for (var i = 0; i < 64; ++i)
-            {
-                if ((bits & mask) != 0)
-                {
-                    ++res;
-                }
-                mask <<= 1;
-            }
-            return res;
         }
 
         /// <summary>
@@ -189,39 +153,8 @@ namespace ProofreadTest
         /// </summary>
         public bool DebugPrint { get; set; }
 
-        private Dictionary<string, UInt64> hashes = new Dictionary<string,ulong>();
+        private Dictionary<string, WordHash> hashes = new Dictionary<string, WordHash>();
         private List<string> correctWords = new List<string>();
         private HashSet<string> correctWordsOld = new HashSet<string>();
-
-        /// <summary>
-        /// 文字列のハッシュ値を生成する。
-        /// </summary>
-        /// <param name="word">文字列</param>
-        /// <returns>ハッシュ値</returns>
-        private UInt64 generateHash(string word)
-        {
-            UInt64 res = 0;
-            foreach (var ch in word)
-            {
-                res |= ((UInt64)1) << (((int)ch) % 64 - 1);
-            }
-            return res;
-        }
-
-        /// <summary>
-        /// 2つのハッシュ値の距離を計算する。
-        /// </summary>
-        /// <param name="a">ハッシュ値</param>
-        /// <param name="b">ハッシュ値</param>
-        /// <returns>ハッシュ値の距離</returns>
-        private int measureHashDist(UInt64 a, UInt64 b)
-        {
-            var ab = a & b;
-            if (ab == 0)
-            {
-                return int.MaxValue;
-            }
-            return Math.Max(CountBits(a - ab), CountBits(b - ab));
-        }
     }
 }
