@@ -47,6 +47,21 @@ namespace ProofreadTest
                 }
             }
 
+            #region debug print
+            if (DebugPrint)
+            {
+                var distList = Enumerable.Range(0, allWords.Count)
+                    .Select(i => Tuple.Create(allWords[i], hashDists[i]))
+                    .ToList();
+                distList.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+                Console.Error.WriteLine("word: {0}", word);
+                foreach (var distPair in distList)
+                {
+                    Console.Error.WriteLine("{0}\t{1}", distPair.Item2, distPair.Item1);
+                }
+            }
+            #endregion
+
             // 候補の中でレーベンシュタイン距離が最も近いものを返す
             var min = int.MaxValue;
             var res = new List<string>();
@@ -132,6 +147,11 @@ namespace ProofreadTest
             correctWords.Add(word);
             correctWordsOld.Add(word);
         }
+
+        /// <summary>
+        /// デバッグ用出力の有無
+        /// </summary>
+        public bool DebugPrint { get; set; }
 
         private Dictionary<string, UInt64> hashes = new Dictionary<string,ulong>();
         private List<string> correctWords = new List<string>();

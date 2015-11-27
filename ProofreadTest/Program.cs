@@ -12,6 +12,7 @@ namespace ProofreadTest
         static void Main(string[] args)
         {
             var pr = new Proofreader();
+            //pr.DebugPrint = true;
 
             // 正しい単語一覧
             foreach (var word in File.ReadAllLines("words.txt"))
